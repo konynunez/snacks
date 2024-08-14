@@ -1,0 +1,25 @@
+{
+  "name": "snacks",
+  "version": "1.0.0",
+  "description": "A simple CRUD for SNACKS, with error handling and CORS.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/konynunez/snacks.git"
+  },
+  "author": "Kony Nunez",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/konynunez/snacks/issues"
+  },
+  "homepage": "https://github.com/konynunez/snacks#readme",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.19.2",
+    "nodemon": "^3.1.4"
+  }
+}
