@@ -8,12 +8,7 @@
 
 `npm install cors`
 
-
-## To run the project locally 
-
-`npm run dev`
-
-## Reposotory
+## Repository
 
 [GitHub][1]
 

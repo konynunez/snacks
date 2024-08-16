@@ -16,7 +16,7 @@
   "bugs": {
     "url": "https://github.com/konynunez/snacks/issues"
   },
-  "homepage": "https://github.com/konynunez/snacks#readme",
+  "homepage": "",
   "dependencies": {
     "cors": "^2.8.5",
     "express": "^4.19.2",
