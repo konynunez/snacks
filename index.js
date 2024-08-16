@@ -12,86 +12,7 @@ const PORT = 4000;
 
 // DATA
 const SNACKS = [
-  {
-    id: 1,
-    name: "Chips",
-    description: "Crunchy and salty potato chips.",
-    price: 2.99,
-    category: "Salty Snacks",
-    inStock: true,
-  },
-  {
-    id: 2,
-    name: "Chocolate Bar",
-    description: "Rich and creamy milk chocolate bar.",
-    price: 1.49,
-    category: "Sweet Snacks",
-    inStock: true,
-  },
-  {
-    id: 3,
-    name: "Popcorn",
-    description: "Buttery and fluffy popcorn.",
-    price: 3.49,
-    category: "Salty Snacks",
-    inStock: false,
-  },
-  {
-    id: 4,
-    name: "Gummy Bears",
-    description: "Colorful and chewy gummy bears.",
-    price: 2.19,
-    category: "Sweet Snacks",
-    inStock: true,
-  },
-  {
-    id: 5,
-    name: "Pretzels",
-    description: "Crispy and twisted pretzels.",
-    price: 2.79,
-    category: "Salty Snacks",
-    inStock: true,
-  },
-  {
-    id: 6,
-    name: "Granola Bar",
-    description: "Healthy and crunchy granola bar.",
-    price: 1.99,
-    category: "Healthy Snacks",
-    inStock: true,
-  },
-  {
-    id: 7,
-    name: "Fruit Snacks",
-    description: "Sweet and fruity gummy snacks.",
-    price: 2.49,
-    category: "Sweet Snacks",
-    inStock: false,
-  },
-  {
-    id: 8,
-    name: "Nuts Mix",
-    description: "A mix of roasted and salted nuts.",
-    price: 4.99,
-    category: "Healthy Snacks",
-    inStock: true,
-  },
-  {
-    id: 9,
-    name: "Energy Bar",
-    description: "High-protein energy bar.",
-    price: 2.59,
-    category: "Healthy Snacks",
-    inStock: true,
-  },
-  {
-    id: 10,
-    name: "Rice Crackers",
-    description: "Light and crispy rice crackers.",
-    price: 3.19,
-    category: "Healthy Snacks",
-    inStock: false,
-  },
+  // (snacks data here)
 ];
 
 // Use CORS Middleware
@@ -112,7 +33,7 @@ app.get("/", (request, response) => {
   response.send("Hello, world!");
 });
 
-//fetching snacks
+// Fetching snacks
 app.get("/snacks", (request, response, next) => {
   try {
     response.status(200).json(SNACKS); // Set response status to 200 (OK)
@@ -138,17 +59,60 @@ app.get('/snacks/:id', (request, response, next) => {
   }
 });
 
+// Adding a new snack
+app.post("/snacks", (request, response) => {
+  try {
+    const newSnack = { id: SNACKS.length + 1, ...request.body }; // create new snack with a new ID
+    SNACKS.push(newSnack);
+    response.status(201).json(newSnack);
+  } catch (error) {
+    next(error);
+  }
+});
+
+// Updating an existing snack
+app.put("/snacks/:id", (request, response, next) => {
+  try {
+    const snackId = parseInt(request.params.id);
+    const snackIndex = SNACKS.findIndex(snack => snack.id === snackId);
+
+    if (snackIndex !== -1) {
+      SNACKS[snackIndex] = { id: snackId, ...request.body };
+      response.status(200).json(SNACKS[snackIndex]);
+    } else {
+      response.status(404).json({ message: "Snack not found." });
+    }
+  } catch (error) {
+    next(error);
+  }
+});
+
+// Deleting a snack
+app.delete("/snacks/:id", (request, response, next) => {
+  try {
+    const snackId = parseInt(request.params.id);
+    const snackIndex = SNACKS.findIndex(snack => snack.id === snackId);
+
+    if (snackIndex !== -1) {
+      const deletedSnack = SNACKS.splice(snackIndex, 1); // remove snack from array
+      response.status(200).json({ message: "Snack deleted successfully.", snack: deletedSnack });
+    } else {
+      response.status(404).json({ message: "Snack not found." });
+    }
+  } catch (error) {
+    next(error);
+  }
+});
+
 // Error Handling
 // Generic error handling middleware
 app.use((error, request, response, next) => {
   console.error(error.stack);
   response.status(500).send("Something broke!");
-  errorStack: error.stack;
-  errorMessage: error.message;
 });
 
 // Handling 404 errors for unmatched routes
-app.use((request, response, next) => {
+app.use((request, response) => {
   response.status(404).json({
     message: "Resource not found. Are you sure you're looking in the right place?",
   });
