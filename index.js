@@ -1,11 +1,19 @@
+//Import Dotenv
+require('dotenv').config();
+
 // Import Express
 const express = require("express");
 
 // Import CORS
 const cors = require("cors");
 
+// Import Axios
+const axios = require("axios");
+
 // Create an express application
 const app = express();
+
+const supabase = require('./supabaseInstance');
 
 // Define a port
 const PORT = 4000;
@@ -107,93 +115,240 @@ app.use((request, response, next) => {
 });
 
 // Define our routes
-// Create a simple route
+// Home 
 app.get("/", (request, response) => {
-  response.send("Hello, world!");
+  response.json({hello: "World!"});
 });
 
-// Fetching snacks
-app.get("/snacks", (request, response, next) => {
+
+// Route to Get all supabase snacks
+app.get("/snacks", async (request, response, next) => {
   try {
-    response.status(200).json(SNACKS); // Set response status to 200 (OK)
+    // response.json(SNACKS);
+    const res = await supabase.get("/snacks");
+    response.json(res.data);
   } catch (error) {
     next(error);
   }
 });
 
-// Fetching snack by ID
-app.get('/snacks/:id', (request, response, next) => {
+// Get a single snack from supabase
+app.get("/snacks/:id", async (request, response, next) => {
   try {
-    const foundSnack = SNACKS.find((value) => {
-      return value.id === parseInt(request.params.id);
-    });
-
-    if (foundSnack) {
-      response.status(200).json(foundSnack);
-    } else {
+    const { id } = request.params;
+    const { data, error } = await supabase.from('snacks').select('*').eq('id', id);
+    if (error) throw error;
+    if (data.length === 0) {
       response.status(404).json({ message: "Snack not found." });
+    } else {
+      response.json(data[0]);
     }
   } catch (error) {
     next(error);
   }
 });
 
-// Adding a new snack
-app.post("/snacks", (request, response) => {
+// Add a new snack to Supabase
+app.post("/snacks", async (request, response, next) => {
   try {
-    const newSnack = { id: SNACKS.length + 1, ...request.body }; // create new snack with a new ID
-    SNACKS.push(newSnack);
-    response.status(201).json(newSnack);
+    const { name, description, price, category, inStock } = request.body;
+
+    if (!name || !description || !price || !category || inStock == null) {
+      return response.status(400).json({ message: "Missing required fields!!" });
+    }
+
+    const newSnack = { name, description, price, category, inStock };
+
+    const { data, error } = await supabase.from('snacks').insert([newSnack]);
+    if (error) throw error;
+
+    response.status(201).json(data[0]);
   } catch (error) {
     next(error);
   }
 });
 
-// Updating an existing snack
-app.put("/snacks/:id", (request, response, next) => {
+// Update an existing snack by ID in Supabase
+app.put("/snacks/:id", async (request, response, next) => {
   try {
-    const snackId = parseInt(request.params.id);
-    const snackIndex = SNACKS.findIndex(snack => snack.id === snackId);
+    const { id } = request.params;
+    const { name, description, price, category, inStock } = request.body;
 
-    if (snackIndex !== -1) {
-      SNACKS[snackIndex] = { id: snackId, ...request.body };
-      response.status(200).json(SNACKS[snackIndex]);
-    } else {
+    if (!name || !description || !price || !category || inStock == null) {
+      return response.status(400).json({ message: "Missing required fields!!" });
+    }
+
+    const updatedSnack = { name, description, price, category, inStock };
+
+    const { data, error } = await supabase.from('snacks').update(updatedSnack).eq('id', id);
+    if (error) throw error;
+
+    if (data.length === 0) {
       response.status(404).json({ message: "Snack not found." });
+    } else {
+      response.status(200).json(data[0]);
     }
   } catch (error) {
     next(error);
   }
 });
 
-// Deleting a snack
-app.delete("/snacks/:id", (request, response, next) => {
+// Delete a snack by ID from Supabase
+app.delete("/snacks/:id", async (request, response, next) => {
   try {
-    const snackId = parseInt(request.params.id);
-    const snackIndex = SNACKS.findIndex(snack => snack.id === snackId);
+    const { id } = request.params;
 
-    if (snackIndex !== -1) {
-      const deletedSnack = SNACKS.splice(snackIndex, 1); // remove snack from array
-      response.status(200).json({ message: "Snack deleted successfully.", snack: deletedSnack });
-    } else {
+    const { data, error } = await supabase.from('snacks').delete().eq('id', id);
+    if (error) throw error;
+
+    if (data.length === 0) {
       response.status(404).json({ message: "Snack not found." });
+    } else {
+      response.status(200).json({ message: "Snack deleted successfully.", snack: data[0] });
     }
   } catch (error) {
     next(error);
   }
 });
+
+// // Fetching  all snacks
+// app.get("/snacks", (request, response, next) => {
+//   try {
+//     response.json(SNACKS); 
+//   } catch (error) {
+//     next(error);
+//   }
+// });
+
+// // Fetching snack by ID
+// app.get('/snacks/:id', (request, response, next) => {
+//   try {
+//     const foundSnack = SNACKS.find((value) => {
+//       return value.id === parseInt(request.params.id);
+//     });
+
+//     if (foundSnack) {
+//       response.status(200).json(foundSnack);
+//     } else {
+//       response.status(404).json({ message: "Snack not found." });
+//     }
+//     response.json(foundSnack);
+//   } catch (error) {
+//     next(error);
+//   }
+// });
+
+// // Adding a new snack
+// app.post("/snacks", (request, response, next) => {
+//   try {
+//     //destructuring request  body object to store the fields in variables
+//     const {name, description, price, category, inStock} = request.body;
+
+//     //error handling for all the fields
+//   if (!name ||!description ||!price ||!category ||!inStock) {
+//     return response
+//     .status(400)
+//     .json({ message: "Missing required fields!!" });
+//   }
+
+//   //Create a new snack
+//     const newSnack = { 
+//    id: SNACKS.length + 1,
+//    name,
+//    description,
+//    price,
+//    category,
+//    inStock,
+//   };
+  
+//   //add the new object to data collection (array)
+//     SNACKS.push(newSnack);
+//     console.log(SNACKS);
+//     response.status(201).json(newSnack);
+//   } catch (error) {
+//     next(error);
+//   }
+// });
+
+// // Updating an existing snack
+// app.put("/snacks/:id", (request, response, next) => {
+//   try {
+//     const foundSnack = SNACKS.find(value => {
+//       return value.id === parseInt(request.params.id);
+//     });
+// //destructuring...
+//     const { name, description, price, category, inStock } = request.body;
+
+// //Error Handling
+//     if (!name || !description || !price || !category || inStock == null) {
+//       return response
+//         .status(400)
+//         .json({ message: "Missing required fields!!" });
+//     }
+
+// //set found object's values
+//     foundSnack.name = name;
+//     foundSnack.description = description;
+//     foundSnack.price = price;
+//     foundSnack.category = category;
+//     foundSnack.inStock = inStock;
+
+
+// //send updated item back in a response
+//     response.status(200).json(foundSnack);
+//     console.log(SNACKS);
+//   } catch (error) {
+//     next(error); 
+//   }
+// });
+
+
+// // Deleting a snack
+// app.delete("/snacks/:id", (request, response, next) => {
+//   try {
+//     const snackId = parseInt(request.params.id);
+
+//     // Find the snack by ID
+//     const foundSnack = SNACKS.find(snack => snack.id === snackId);
+
+//     // Error handling for non-existent snack
+//     if (!foundSnack) {
+//       return response
+//       .status(404)
+//       .json({ message: "Snack not found." });
+//     }
+
+//     // Get the index of the found snack
+//     const snackIndex = SNACKS.indexOf(foundSnack);
+
+//     // Remove snack from array
+//     const deletedSnack = SNACKS.splice(snackIndex, 1)[0]; // destructure to get the deleted snack directly
+
+//     // Send response with success message and the deleted snack
+//     response.status(200)
+//     .json({ message: "Snack deleted successfully.", snack: deletedSnack });
+//     console.log(SNACKS);
+//   } catch (error) {
+//     next(error);
+//   }
+// });
+
 
 // Error Handling
 // Generic error handling middleware
 app.use((error, request, response, next) => {
   console.error(error.stack);
-  response.status(500).send("Something broke!");
+  response.status(500).json({error: "Something Broke!", 
+    errorStack: error.stack,
+    errorMessage: error.message,
+  })
 });
 
 // Handling 404 errors for unmatched routes
-app.use((request, response) => {
-  response.status(404).json({
-    message: "Resource not found. Are you sure you're looking in the right place?",
+app.use((request, response, next) => {
+  response.status(404).json({ 
+    error:
+    "Resource not found. Are you sure you're looking in the right place?",
   });
 });
 

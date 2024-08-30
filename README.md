@@ -20,3 +20,5 @@
 - Node.js
 - Nodemon
 - Postman
+- Supabase
+- Axios
