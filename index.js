@@ -135,82 +135,99 @@ app.get("/snacks", async (request, response, next) => {
 // Get a single snack from supabase
 app.get("/snacks/:id", async (request, response, next) => {
   try {
-    const { id } = request.params;
-    const { data, error } = await supabase.from('snacks').select('*').eq('id', id);
-    if (error) throw error;
-    if (data.length === 0) {
-      response.status(404).json({ message: "Snack not found." });
-    } else {
-      response.json(data[0]);
+
+    const res = await supabase.get(`/snacks?id=eq.${request.id}`);
+
+    //error handling
+    if (!response.data.length) {
+      return response.status(404).json({ message: "Snack does not exist!"});
     }
+  
+//send snack object
+    response.json(data[0]);
   } catch (error) {
     next(error);
   }
 });
+      
+      
+//route to delete a single snack by id
+app.delete('/snacks/:id', async (request, response, next) => {
+  try {
+    const res = await supabase.delete(`/snacks?=eq.${request.params.id}`);
+    response.status(204).send();
+
+  } catch (error) {
+    next(error);
+  }
+})
 
 // Add a new snack to Supabase
-app.post("/snacks", async (request, response, next) => {
+app.post("/snacks", (request, response, next) => {
   try {
+//destructure our request.body object so we can store the fields in variables
     const { name, description, price, category, inStock } = request.body;
 
     if (!name || !description || !price || !category || inStock == null) {
-      return response.status(400).json({ message: "Missing required fields!!" });
+      return response
+      .status(400)
+      .json({ message: "Missing required fields!!" });
     }
 
-    const newSnack = { name, description, price, category, inStock };
+//create a new object with new id
+    const newSnack = { 
+      //id: SNACKS.length = 1,
+      name, 
+      description, 
+      price, 
+      category, 
+      inStock 
+    };
 
-    const { data, error } = await supabase.from('snacks').insert([newSnack]);
+//send our object to our SQL db
+    const res = supabase.post('/snacks', newSnack);
     if (error) throw error;
 
-    response.status(201).json(data[0]);
+    response.status(201).json(newSnack);
   } catch (error) {
     next(error);
   }
 });
 
 // Update an existing snack by ID in Supabase
-app.put("/snacks/:id", async (request, response, next) => {
+app.put("/snacks/:id", (request, response, next) => {
   try {
-    const { id } = request.params;
+    const doundSnack = SNACKS.find((value) => {
+      return value.id === parseInt(request.params.id);
+    });
+
+//destructure our request.body object so we can store the fields in variables
     const { name, description, price, category, inStock } = request.body;
 
+
+//error handling if request doesn't send all fields necessary
     if (!name || !description || !price || !category || inStock == null) {
-      return response.status(400).json({ message: "Missing required fields!!" });
+      return response
+      .status(400)
+      .json({ message: "Missing required fields!!" });
     }
 
-    const updatedSnack = { name, description, price, category, inStock };
+    //set our found object's value to the ones sent in the request body
+    foundSnack.name;
+    foundSnack.description = description;
+    foundSnack.price = price;
+    foundSnack.category = category;
+    foundSnack.inStock = inStock;
 
-    const { data, error } = await supabase.from('snacks').update(updatedSnack).eq('id', id);
-    if (error) throw error;
-
-    if (data.length === 0) {
-      response.status(404).json({ message: "Snack not found." });
-    } else {
-      response.status(200).json(data[0]);
-    }
+//send our updated item back in a response
+response.json(foundSnack);
+console.log(SNACKS);
   } catch (error) {
     next(error);
   }
 });
 
-// Delete a snack by ID from Supabase
-app.delete("/snacks/:id", async (request, response, next) => {
-  try {
-    const { id } = request.params;
-
-    const { data, error } = await supabase.from('snacks').delete().eq('id', id);
-    if (error) throw error;
-
-    if (data.length === 0) {
-      response.status(404).json({ message: "Snack not found." });
-    } else {
-      response.status(200).json({ message: "Snack deleted successfully.", snack: data[0] });
-    }
-  } catch (error) {
-    next(error);
-  }
-});
-
+//LEFT FOR LEARNING PURPOSE
 // // Fetching  all snacks
 // app.get("/snacks", (request, response, next) => {
 //   try {
