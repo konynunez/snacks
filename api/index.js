@@ -1,0 +1,83 @@
+//Import Dotenv
+require("dotenv").config();
+
+// Import Express
+const express = require("express");
+
+// Import CORS
+const cors = require("cors");
+
+// Import Axios
+const axios = require("axios");
+
+//Import our Supabase Instance
+const supabase = require("../supabaseInstance");
+
+//import Our route functions
+const getAll = require("../api/routes/getAll");
+const getById = require("../api/routes/getById");
+const deleteById = require("../api/routes/deleteById");
+const updateById = require("../api/routes/updateById");
+const addItem = require("../api/routes/addItem");
+
+// Create an express application
+const app = express();
+
+// Define a port
+const PORT = 4000;
+
+// Use CORS Middleware
+const corsOptions = {
+  origin: "http://localhost:4000",
+  optionsSuccessStatus: 200, // some browsers (IE11,  various smartTVs) choke on 204
+};
+
+app.use(cors(corsOptions));
+
+// Use JSON middleware to parse request bodies
+app.use(express.json());
+
+// Define our Route
+//Home Route
+app.get("/", (request, response, next) => {
+  response.json({ hello: "World!" });
+});
+
+// Route to Get all supabase snacks
+app.get("/snacks", getAll);
+
+// Get a single snack by ID from supabase
+app.get("/snacks/:id", getById);
+
+//route to delete a single snack by id
+app.delete("/snacks/:id", deleteById);
+
+// Add a new snack to Supabase
+app.post("/snacks", addItem);
+
+// Update an existing snack by ID in Supabase
+app.put("/snacks/:id", updateById);
+
+// Error Handling
+// Generic error handling middleware
+app.use((error, request, response, next) => {
+  console.error(error.stack);
+  response.status(500).json({
+    error: "Something Broke!",
+    errorStack: error.stack,
+    errorMessage: error.message,
+  });
+});
+
+// Handling 404 errors for unmatched routes
+app.use((request, response, next) => {
+  response.status(404).json({
+    error:
+      "Resource not found. Are you sure you're looking in the right place?",
+  });
+});
+
+// Make the server listen on our port
+app.listen(PORT, () => {
+  console.log(`The server is running on http://localhost:${PORT}`);
+});
