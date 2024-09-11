@@ -1,3 +1,6 @@
+//Import supabase instance
+const supabase = require("../../supabaseInstance");
+
 const addItem = async (request, response, next) => {
   try {
     //destructure our request.body object so we can store the fields in variables
@@ -5,7 +8,9 @@ const addItem = async (request, response, next) => {
 
     //Error handling if request doesn't send all fields necessary
     if (!name || !description || !price || !category || !inStock) {
-      return response.status(400).json({ message: "Missing required fields" });
+      return response
+        .status(400)
+        .json({ message: "Missing required fields!!!" });
     }
 
     //Create a new object with a new ID

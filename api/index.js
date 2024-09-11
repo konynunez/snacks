@@ -28,7 +28,7 @@ const PORT = 4000;
 
 // Use CORS Middleware
 const corsOptions = {
-  origin: "http://localhost:4000",
+  origin: "https://example.com",
   optionsSuccessStatus: 200, // some browsers (IE11,  various smartTVs) choke on 204
 };
 
@@ -36,6 +36,19 @@ app.use(cors(corsOptions));
 
 // Use JSON middleware to parse request bodies
 app.use(express.json());
+
+//Middleware for api key security
+app.use((request, response, next) => {
+  const apiKey = request.headers["api-key"];
+
+  if (apiKey !== process.env.ADMIN_API_KEY) {
+    return response.status(403).json({
+      message:
+        "ACCESS DENIED! You need an API key for that.  See our administrators",
+    });
+  }
+  next();
+});
 
 // Define our Route
 //Home Route
@@ -69,7 +82,7 @@ app.use((error, request, response, next) => {
   });
 });
 
-// Handling 404 errors for unmatched routes
+//404 Resource not found error handling
 app.use((request, response, next) => {
   response.status(404).json({
     error:
@@ -81,3 +94,7 @@ app.use((request, response, next) => {
 app.listen(PORT, () => {
   console.log(`The server is running on http://localhost:${PORT}`);
 });
+
+//export our app for testing
+
+module.exports = app;

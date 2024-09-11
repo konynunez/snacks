@@ -1,3 +1,6 @@
+// Import supabase instance
+const Supabase = require("../../supabaseInstance");
+
 const updateById = async (request, response, next) => {
   try {
     //Destructure our request.body object
@@ -8,7 +11,7 @@ const updateById = async (request, response, next) => {
       return response.status(400).json({ error: "Missing required fields" });
     }
 
-    const updateBeverage = {
+    const updatedSnack = {
       //id: SNACKS.length + 1,
       name,
       description,
@@ -19,7 +22,7 @@ const updateById = async (request, response, next) => {
 
     const res = await Supabase.patch(
       `/snacks?id=eq.${request.params.id}`,
-      updateSnack
+      updatedSnack
     );
   } catch (error) {
     next(error);
