@@ -25,7 +25,7 @@ const docs = require("../api/routes/docs");
 const app = express();
 
 // Define a port
-// const PORT = process.env.PORT || 4000;
+const PORT = process.env.PORT || 4000;
 
 // Use CORS Middleware
 const corsOptions = {
@@ -91,10 +91,10 @@ app.use((req, res) => {
   });
 });
 
-// // // Start the server and assign it to the `server` variable
-// // const server = app.listen(PORT, () => {
-// //   console.log(`The server is running on http://localhost:${PORT}`);
-// });
+// Start the server and assign it to the `server` variable
+const server = app.listen(PORT, () => {
+  console.log(`The server is running on http://localhost:${PORT}`);
+});
 
 // Export the app and server for testing
 module.exports = { app };

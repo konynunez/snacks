@@ -1,29 +1,28 @@
-// Import supabase instance
-const Supabase = require("../../supabaseInstance");
+const supabase = require("../../supabaseInstance");
 
 const updateById = async (request, response, next) => {
   try {
     // Destructure our request.body object
-    const { name, description, price, category, InStock } = request.body;
+    const { name, description, price, category, inStock } = request.body;
 
     // Error handling if request doesn't send all fields necessary
-    if (!name || !description || !price || !category || !InStock) {
-      return response.status(400).json({ error: "Missing required fields" });
+    if (!name || !description || !price || !category || inStock === undefined) {
+      return response.status(400).json({ message: "Missing required fields!" });
     }
 
-    // Update object to be sent to Supabase
     const updatedSnack = {
       name,
       description,
       price,
       category,
-      inStock: InStock, // Correct case for inStock field
+      inStock, // Ensure this field matches your table's column name
     };
 
-    // Make sure to use the correct Supabase method to update a record
-    const { data, error } = await Supabase.from("snacks") // Make sure 'snacks' is the correct table name
+    // Use PATCH method to update the snack in Supabase
+    const { data, error } = await supabase
+      .from("snacks")
       .update(updatedSnack)
-      .eq("id", request.params.id); // Match by id in the URL
+      .eq("id", request.params.id);
 
     // Handle potential errors from Supabase
     if (error) {
@@ -31,8 +30,8 @@ const updateById = async (request, response, next) => {
     }
 
     // If no data is returned, it means the snack with the given id was not found
-    if (!data.length) {
-      return response.status(404).json({ error: "Snack not found" });
+    if (data.length === 0) {
+      return response.status(404).json({ message: "Snack not found" });
     }
 
     // Send updated snack data in response
