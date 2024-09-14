@@ -25,7 +25,7 @@ const docs = require("../api/routes/docs");
 const app = express();
 
 // Define a port
-const PORT = 4000;
+const PORT = process.env.PORT || 4000;
 
 // Use CORS Middleware
 const corsOptions = {
@@ -97,4 +97,4 @@ app.listen(PORT, () => {
 });
 
 //export our app for testing
-module.exports = { app };
+module.exports = { server, app };
