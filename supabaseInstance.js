@@ -9,6 +9,7 @@ const instance = axios.create({
   headers: {
     apikey: process.env.SUPABASE_KEY,
     Authorization: "Bearer " + process.env.SUPABASE_KEY,
+    "Content-Type": "application/json",
   },
 });
 

@@ -19,6 +19,7 @@ const getById = require("../api/routes/getById");
 const deleteById = require("../api/routes/deleteById");
 const updateById = require("../api/routes/updateById");
 const addItem = require("../api/routes/addItem");
+const docs = require("../api/routes/docs");
 
 // Create an express application
 const app = express();
@@ -53,7 +54,7 @@ app.use((request, response, next) => {
 // Define our Route
 //Home Route
 app.get("/", (request, response, next) => {
-  response.json({ hello: "World!" });
+  response.json(docs);
 });
 
 // Route to Get all supabase snacks
@@ -96,5 +97,4 @@ app.listen(PORT, () => {
 });
 
 //export our app for testing
-
-module.exports = app;
+module.exports = { app };

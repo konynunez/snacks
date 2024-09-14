@@ -1,6 +1,6 @@
 # SNACKS
-### A simple CRUD with error handling, CORS and Postman support.
 
+### A simple CRUD with error handling, CORS and Postman support.
 
 ## Install Dependencies
 
@@ -14,11 +14,13 @@
 
 [1]: https://github.com/konynunez/snacks.git
 
-
 ## Technologies Used
+
 - Express.js
 - Node.js
 - Nodemon
 - Postman
 - Supabase
 - Axios
+- Jest
+- Supertest

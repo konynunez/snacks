@@ -8,7 +8,7 @@
     "start": "nodemon api/index.js"
   },
   "jest": {
-    "testEnviroment": "node"
+    "testEnvironment": "node"
   },
   "repository": {
     "type": "git",
