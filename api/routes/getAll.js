@@ -6,7 +6,7 @@ const cache = {};
 const getAll = async (request, response, next) => {
   try {
     if (cache["snacks"]) {
-      console.log("CACHE HIT");
+      console.log("CACHE MONEY!!!");
       return response.json(cache["snacks"]);
     }
 
@@ -15,7 +15,7 @@ const getAll = async (request, response, next) => {
     // Add the response data to our cache
     cache["snacks"] = res.data;
 
-    console.log("DATA CACHED");
+    console.log("ADDED TO CACHE");
     response.json(res.data);
   } catch (error) {
     next(error);

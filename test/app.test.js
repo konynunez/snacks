@@ -1,10 +1,5 @@
-// Import Dotenv
 require("dotenv").config();
-
-// Import Supertest for testing
 const request = require("supertest");
-
-// Import app and server from our API
 const { app, server } = require("../api/index");
 
 describe("Snack API", () => {
@@ -27,7 +22,7 @@ describe("Snack API", () => {
     expect(response.body).toHaveProperty("id", snackId);
   });
 
-  // Test POST a new snack
+  // Test add a new snack
   it("should add a new snack", async () => {
     const newSnack = {
       name: "Sunshine Blend",
@@ -58,26 +53,43 @@ describe("Snack API", () => {
     expect(response.status).toBe(204); // No content expected for DELETE
   });
 
-  // Test PUT to update a snack by ID
+  // Test PATCH to update a snack by ID
   it("should update a snack by ID", async () => {
-    const snackId = 1; // Use a valid ID
+    const snackId = 31; // Use a valid ID
     const updatedSnack = {
       name: "Coconut Water",
       description: "natural coconut water",
       price: 3.5,
       category: "drinks",
-      inStock: true, // Ensure 'inStock' is properly written
+      inStock: true,
     };
-    const response = await request(app)
-      .put(`/snacks/${snackId}`)
+
+    // Perform the PATCH request
+    await request(app)
+      .put(`/snacks/${snackId}`) // Use PATCH method
       .set("api-key", process.env.ADMIN_API_KEY)
       .send(updatedSnack);
-    expect(response.status).toBe(200);
-    expect(response.body).toHaveProperty("price", 3.5);
+
+    // Fetch the updated snack to verify changes
+    const updatedResponse = await request(app)
+      .get(`/snacks/${snackId}`)
+      .set("api-key", process.env.ADMIN_API_KEY);
+
+    // Check if the response body contains the updated snack details
+    expect(updatedResponse.status).toBe(200);
+    expect(updatedResponse.body).toHaveProperty("name", "Coconut Water");
+    expect(updatedResponse.body).toHaveProperty(
+      "description",
+      "natural coconut water"
+    );
+    expect(updatedResponse.body).toHaveProperty("price", 3.5);
   });
 
-  // Close the server after all tests
   afterAll((done) => {
-    server.close(done); // Ensure server is closed after tests
+    if (server) {
+      server.close(done);
+    } else {
+      done();
+    }
   });
 });
