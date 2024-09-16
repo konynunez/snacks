@@ -15,7 +15,7 @@ const updateById = async (request, response, next) => {
       description,
       price,
       category,
-      inStock, // Ensure this field matches your table's column name
+      inStock,
     };
 
     // Use PATCH method to update the snack in Supabase
