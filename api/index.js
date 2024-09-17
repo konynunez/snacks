@@ -29,7 +29,7 @@ const PORT = 4000;
 
 // Use CORS Middleware
 const corsOptions = {
-  origin: "https://example.com",
+  origin: process.env.SNACK_CLIENT,
   optionsSuccessStatus: 200,
 };
 
@@ -99,4 +99,4 @@ const server = app.listen(PORT, () => {
 });
 
 // Export the app and server for testing
-module.exports = { app };
+module.exports = app;
