@@ -1,7 +1,11 @@
 require("dotenv").config();
 const request = require("supertest");
-const { app, server } = require("../api/index");
+const app = require("../api/index");
+const port = 4001;
 
+const server = app.listen(PORT, () => {
+  console.log(`the server is running on http://localhost:${PORT}`);
+});
 describe("Snack API", () => {
   // Test GET all snacks
   it("should return all snacks", async () => {
@@ -46,7 +50,7 @@ describe("Snack API", () => {
 
   // Test DELETE a snack by ID
   it("should delete a snack by ID", async () => {
-    const snackId = 2; // Adjust this ID for testing purposes
+    const snackId = 2;
     const response = await request(app)
       .delete(`/snacks/${snackId}`)
       .set("api-key", process.env.ADMIN_API_KEY);
@@ -66,7 +70,7 @@ describe("Snack API", () => {
 
     // Perform the PATCH request
     await request(app)
-      .put(`/snacks/${snackId}`) // Use PATCH method
+      .put(`/snacks/${snackId}`)
       .set("api-key", process.env.ADMIN_API_KEY)
       .send(updatedSnack);
 
