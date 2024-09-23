@@ -29,7 +29,7 @@ const PORT = 4000;
 
 // Use CORS Middleware
 const corsOptions = {
-  origin: process.env.SNACK_CLIENT,
+  origin: "*",
   optionsSuccessStatus: 200,
 };
 
@@ -95,7 +95,7 @@ app.use((request, response, next) => {
 });
 
 // Start the server and assign it to the `server` variable
-const server = app.listen(PORT, () => {
+app.listen(PORT, () => {
   console.log(`The server is running on http://localhost:${PORT}`);
 });
 
